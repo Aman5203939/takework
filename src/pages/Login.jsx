@@ -6,21 +6,28 @@ export default function Login() {
   const [password, setPassword] = useState("");
 
   const login = async () => {
-    const res = await axios.post("http://localhost:5000/api/auth/login", {
-      email,
-      password
-    });
+    try {
+      const res = await axios.post(
+        "https://takework.onrender.com/api/auth/login",
+        { email, password }
+      );
 
-    localStorage.setItem("token", res.data.token);
-    alert("Login Success");
+      localStorage.setItem("token", res.data.token);
+      alert("Login Success");
+    } catch (err) {
+      alert("Login Failed");
+    }
   };
 
   return (
     <div>
       <h2>Login</h2>
-      <input placeholder="Email" onChange={e => setEmail(e.target.value)} />
-      <input placeholder="Password" type="password"
-        onChange={e => setPassword(e.target.value)} />
+      <input placeholder="Email"
+        onChange={(e) => setEmail(e.target.value)} />
+      <br />
+      <input type="password" placeholder="Password"
+        onChange={(e) => setPassword(e.target.value)} />
+      <br />
       <button onClick={login}>Login</button>
     </div>
   );
