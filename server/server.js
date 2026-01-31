@@ -1,23 +1,28 @@
 const express = require("express");
-const mongoose = require("mongoose");
 const cors = require("cors");
 require("dotenv").config();
 
+const connectDB = require("./config/db");
+
 const app = express();
+
+/* ==============================
+   Connect Database
+============================== */
+connectDB();
 
 /* ==============================
    CORS Configuration
 ============================== */
 
 const allowedOrigins = [
-  "http://localhost:5173",             // Local Vite
-  "https://takework.vercel.app"        // Production Frontend
+  "http://localhost:5173",
+  "https://takework.vercel.app"
 ];
 
 app.use(
   cors({
     origin: function (origin, callback) {
-      // allow requests with no origin (like Postman)
       if (!origin) return callback(null, true);
 
       if (allowedOrigins.includes(origin)) {
@@ -31,17 +36,6 @@ app.use(
 );
 
 app.use(express.json());
-
-/* ==============================
-   MongoDB Connection
-============================== */
-
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log("MongoDB Connected"))
-  .catch(err => {
-    console.error("MongoDB connection error:", err.message);
-    process.exit(1);
-  });
 
 /* ==============================
    Routes
