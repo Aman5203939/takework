@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
+const path = require("path");
 
 const connectDB = require("./config/db");
 
@@ -28,7 +29,7 @@ app.use(
       if (allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
-        callback(new Error("Not allowed by CORS"));
+        callback(null, true); // Allow all in production (important for cyclic)
       }
     },
     credentials: true
@@ -43,6 +44,18 @@ app.use(express.json());
 
 app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/jobs", require("./routes/jobRoutes"));
+
+/* ==============================
+   Serve Frontend (IMPORTANT)
+============================== */
+
+const __dirnamePath = path.resolve();
+
+app.use(express.static(path.join(__dirnamePath, "client/dist")));
+
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirnamePath, "client/dist", "index.html"));
+});
 
 /* ==============================
    Server Start
