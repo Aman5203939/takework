@@ -1,7 +1,6 @@
 const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
-const path = require("path");
 
 const connectDB = require("./config/db");
 
@@ -15,7 +14,6 @@ connectDB();
 /* ==============================
    CORS Configuration
 ============================== */
-
 const allowedOrigins = [
   "http://localhost:5173",
   "https://takework.vercel.app"
@@ -23,46 +21,39 @@ const allowedOrigins = [
 
 app.use(
   cors({
-    origin: function (origin, callback) {
+    origin: (origin, callback) => {
       if (!origin) return callback(null, true);
-
       if (allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
-        callback(null, true); // Allow all in production (important for cyclic)
+        callback(null, true); // allow all (Railway-safe)
       }
     },
     credentials: true
   })
 );
 
+/* ==============================
+   Middlewares
+============================== */
 app.use(express.json());
 
 /* ==============================
    Routes
 ============================== */
-
 app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/jobs", require("./routes/jobRoutes"));
 
 /* ==============================
-   Serve Frontend (IMPORTANT)
+   Health Check / Fallback
 ============================== */
+app.get("/", (req, res) => {
+  res.json({ message: "API is running 🚀" });
+});
 
-const __dirnamePath = path.resolve();
-
-app.use(express.static(path.join(__dirnamePath, "client/dist")));
-
-app.get("/*", (req, res) => {
-  res.sendFile(path.join(__dirnamePath, "client/dist", "index.html"));
+app.use((req, res) => {
+  res.status(404).json({ message: "Route not found" });
 });
 
 /* ==============================
-   Server Start
-============================== */
-
-const PORT = process.env.PORT || 5000;
-
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+   Server St
